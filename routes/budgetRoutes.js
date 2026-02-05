@@ -18,6 +18,29 @@ router.post("/", auth, (req, res) => {
   );
 });
 
+router.put("/", auth, (req, res) => {
+  const { category, monthly_limit, month_year } = req.body;
+
+  db.query(
+    `UPDATE budgets
+     SET monthly_limit = ?
+     WHERE user_id = ? AND category = ? AND month_year = ?`,
+    [monthly_limit, req.userId, category, month_year],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Update failed" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Budget not found" });
+      }
+
+      res.json({ message: "Budget updated successfully" });
+    }
+  );
+});
+
+
 router.get("/compare", auth, (req, res) => {
   db.query(
     `
